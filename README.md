@@ -4,6 +4,7 @@
 - mysql 5.1.73
 - tomcat7
 - mysql-connector-java-5.1.45-bin
+- oracle 10g
 
 ## 개요
 - 한림대학교 동아리 관리 플랫폼
@@ -34,5 +35,6 @@
 ```
 DataBase : 데이터베이스 
 Settings : 설정
-Source_Code : 웹 페이지(JSP, CSS 등) 소스 코드 
+hallym_club : 웹 페이지(JSP, CSS 등) 소스 코드 , Oracle 사용
+hallym_club_mysql : 웹 페이지(JSP, CSS 등) 소스 코드 , MySQL 사용
 ```
