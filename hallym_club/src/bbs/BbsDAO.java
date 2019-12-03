@@ -122,7 +122,9 @@ public class BbsDAO {
 				list.add(bbs);
 				hit++;
 			}
-			list.get(0).setRow_count(getTotal(club_id, board_cd, condition));
+			if(!list.isEmpty()){
+				list.get(0).setRow_count(getTotal(club_id, board_cd, condition));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
