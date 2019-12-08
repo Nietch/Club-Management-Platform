@@ -115,10 +115,12 @@ public class JDBC_clubDAO {
 //					+ "WHERE A.CLUB_GB_CD LIKE ? AND A.CLUB_AT_CD LIKE ?"
 //					+ "ORDER BY B.STAFF_CD IS NULL ASC, STAFF_CD ASC)X "
 //					+ "GROUP BY CLUB_ID ORDER BY CLUB_CNT DESC LIMIT " + limit_cnt;
-			sql = "SELECT ROWNUM , Z.* FROM (SELECT  A.*, NVL(B.STAR,0) AS STAR_CNT FROM CLUB A LEFT OUTER JOIN("+
-					"SELECT CLUB_ID, COUNT(*) AS STAR FROM CLUB_MEMBER WHERE STAR ='Y' GROUP BY CLUB_ID)B"+
-					" ON A.CLUB_ID = B.CLUB_ID WHERE A.CLUB_ID <> 1 AND A.CLUB_GB_CD LIKE ? AND A.CLUB_AT_CD LIKE ? "+
-					"ORDER BY STAR_CNT DESC, A.CLUB_CNT DESC)Z WHERE ROWNUM > 0 AND ROWNUM <= ?";
+			sql = "SELECT ROWNUM, T.* FROM(SELECT C.*, NVL(D.NM,' ') AS NM, NVL(D.PHONE_NO,' ') AS PHONE_NO, NVL(D.STAR,0)"
+					+" AS CNT_STAR FROM CLUB C LEFT OUTER JOIN(SELECT A.CLUB_ID, A.NM, A.PHONE_NO, B.STAR FROM CLUB_MEMBER A "
+					+ "LEFT OUTER JOIN (SELECT CLUB_ID, NVL(COUNT(*),0) AS STAR FROM CLUB_MEMBER WHERE STAR = 'Y' GROUP BY CLUB_ID)B"
+					+ " ON A.CLUB_ID = B.CLUB_ID WHERE A.STAFF_CD = '004001')D ON C.CLUB_ID = D.CLUB_ID "
+					+ " WHERE C.CLUB_ID <> 1 AND C.CLUB_GB_CD LIKE ? AND C.CLUB_AT_CD LIKE ? "
+					+ " ORDER BY D.STAR DESC NULLS LAST)T WHERE ROWNUM  <= ? ";
 			
 			conn = JDBCUtil.getConnection();
 			pstmt = conn.prepareStatement(sql);
@@ -144,6 +146,8 @@ public class JDBC_clubDAO {
 				vo.setInput_id(rs.getString("INPUT_ID"));
 				vo.setInput_ip(rs.getString("INPUT_IP"));
 				vo.setInput_date(rs.getString("INPUT_DATE"));
+				vo.setStaff_nm(rs.getString("NM"));
+				vo.setStaff_phone(rs.getString("PHONE_NO"));
 				list.add(vo);
 			}
 		} catch (Exception e) {
