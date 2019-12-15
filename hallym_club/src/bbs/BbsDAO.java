@@ -183,67 +183,47 @@ public class BbsDAO {
 		} finally {
 			JDBCUtil.closeResource(rs, pstmt, conn);
 		}
-
 		return null;
-
 	}
 
 	public int update(Bbs bbs) {
 		String SQL = "UPDATE board SET TITLE = ?, CONTENTS = ? WHERE BOARD_NO = ?";
-
 		if (bbs.getStart_date() != null || bbs.getEnd_date() != null) {
 			SQL = "UPDATE board SET TITLE = ?, CONTENTS = ?, START_DATE = '" + bbs.getStart_date() + "', END_DATE = '"
 					+ bbs.getEnd_date() + "' WHERE BOARD_NO = ?";
 		}
-
 		try {
 			conn = JDBCUtil.getConnection();
 			pstmt = conn.prepareStatement(SQL);
 			pstmt.setString(1, bbs.getTITLE());
 			pstmt.setString(2, bbs.getCONTENTS());
 			pstmt.setInt(3, bbs.getBOARD_NO());
-
 			return pstmt.executeUpdate();
-
 		} catch (Exception e) {
-
 			e.printStackTrace();
-
 		} finally {
 			JDBCUtil.closeResource(pstmt, conn);
 		}
-
 		return -1;
-
 	}
 
 	public int delete(int BOARD_NO) {
-
 		String SQL = "UPDATE board SET bbsAvailable = 0 WHERE BOARD_NO = ?";
-
 		try {
 			conn = JDBCUtil.getConnection();
 			pstmt = conn.prepareStatement(SQL);
-
 			pstmt.setInt(1, BOARD_NO);
-
 			return pstmt.executeUpdate();
-
 		} catch (Exception e) {
-
 			e.printStackTrace();
-
 		} finally {
 			JDBCUtil.closeResource(pstmt, conn);
 		}
-
 		return -1;
-
 	}
 
 	// 추가 , 메인화면 공지사항  가져오기
 	public ArrayList<Bbs> get_intro(int club_id, String board_cd) {
-
 		String SQL = "SELECT * FROM (SELECT TITLE, BOARD_NO, INPUT_DATE FROM BOARD WHERE CLUB_ID = 1 AND BOARD_CD = ? " +
 				" AND BBSAVAILABLE = 1 ORDER BY BOARD_NO DESC)X WHERE ROWNUM <= 6";
 		ArrayList<Bbs> list = null;
@@ -323,17 +303,11 @@ public class BbsDAO {
 				arr[1] = rs.getString(2);
 				titleList.add(arr);
 			}
-
 		} catch (Exception e) {
-
 			e.printStackTrace();
-
 		} finally {
 			JDBCUtil.closeResource(rs, pstmt, conn);
 		}
-
 		return titleList;
-
 	}
-
 }

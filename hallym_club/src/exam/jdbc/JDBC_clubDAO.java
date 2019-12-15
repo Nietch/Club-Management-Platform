@@ -178,80 +178,14 @@ public class JDBC_clubDAO {
 		return prof_name;
 	}
 
-	public ArrayList<ClubVO> getboardwriteClub(String student_id) {
-		ArrayList<ClubVO> clubList = null;
-		String SQL = "";
-		try {
-			SQL = "SELECT * FROM CLUB WHERE CLUB_ID = ANY(SELECT CLUB_ID FROM CLUB_MEMBER WHERE STUDENT_ID = ? AND JOIN_CD = 008001)";
-			conn = JDBCUtil.getConnection();
-			pstmt = conn.prepareStatement(SQL);
-			pstmt.setString(1, student_id);
-			rs = pstmt.executeQuery();
-			clubList = new ArrayList<ClubVO>();
-			while (rs.next()) {
-				ClubVO vo = new ClubVO();
-				vo.setClub_id(rs.getInt(1));
-				vo.setClub_nm(rs.getString(2));
-				clubList.add(vo);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			JDBCUtil.closeResource(rs, pstmt, conn);
-		}
-		return clubList;
-	}
-
-	public int createClub(ClubVO CV, String student_id) {
-		String SQL = "INSERT INTO club(CLUB_ID, CLUB_NM, CLUB_GB_CD, CLUB_AT_CD, CLUB_CNT, CLUB_AIM, CLUB_ACTIVE, CLUB_ROOM, "
-				+ "OPEN_DT, INTRO_FILE_NM, INTRO_SAVE_FILE_NM, POSTER_FILE_NM, POSTER_SAVE_FILE_NM) VALUES((SELECT ifnull(MAX(CLUB_ID),0)+1 FROM CLUB AS C),?,?,?,?,?,?,?,?,?,?,?,?)";
-
-		String SQL2 = "INSERT INTO CLUB_MEMBER(CLUB_ID, STUDENT_ID, STAFF_CD, JOIN_DT, JOIN_CD) VALUES "
-				+ "((SELECT ifnull(MAX(CLUB_ID),0) FROM CLUB AS C),?,'004001',?,'008001')";
-		try {
-			conn = JDBCUtil.getConnection();
-			pstmt = conn.prepareStatement(SQL);
-			pstmt.setString(1, CV.getClub_nm());
-			pstmt.setString(2, CV.getClub_gb_cd());
-			pstmt.setString(3, CV.getClub_at_cd());
-			pstmt.setInt(4, CV.getCnt());
-			pstmt.setString(5, CV.getClub_aim());
-			pstmt.setString(6, CV.getClub_active());
-			pstmt.setString(7, CV.getClub_room());
-			pstmt.setString(8, CV.getOpen_dt());
-			pstmt.setString(9, CV.getIntro_file_nm());
-			pstmt.setString(10, CV.getIntro_save_file_nm());
-			pstmt.setString(11, CV.getPoster_file_nm());
-			pstmt.setString(12, CV.getPoster_save_file_nm());
-			pstmt.executeUpdate();
-			JDBCUtil.closeResource(pstmt, conn);
-
-			pstmt = conn.prepareStatement(SQL2);
-			pstmt.setString(1, student_id);
-
-			java.util.Date dt = new java.util.Date();
-			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd");
-			String today = sdf.format(dt);
-
-			pstmt.setString(2, today);
-			return pstmt.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			JDBCUtil.closeResource(rs, pstmt, conn);
-		}
-
-		return -1; // 데이터베이스 오류
-
-	}
-
 	public String getIntro_FilePath(int club_id) {
-		String SQL = "select POSTER_SAVE_FILE_NM from club where CLUB_ID=" + club_id + "";
+		String SQL = "select POSTER_SAVE_FILE_NM from club where CLUB_ID=? ";
 		String Intro_FilePath = "";
 
 		try {
 			conn = JDBCUtil.getConnection();
 			pstmt = conn.prepareStatement(SQL);
+			pstmt.setInt(1, club_id);
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
 				Intro_FilePath = rs.getString(1);
@@ -292,50 +226,47 @@ public class JDBC_clubDAO {
 	// intro, 동아리 조회
 	public ArrayList<ClubVO> getClubIntro(String student_id) {
 		ArrayList<ClubVO> clubList = null;
-		String SQL = "";
+		String sql = "";
 		try {
 			if (student_id == "") {
-				SQL = "SELECT C.CLUB_ID, C.CLUB_NM, C.INTRO_SAVE_FILE_NM, C.CLUB_AIM, C.CLUB_ACTIVE, S.SO_NM, D.SO_NM FROM CLUB AS C "
-						+ "JOIN SO_CD AS S ON C.CLUB_GB_CD = S.SO_CD JOIN SO_CD AS D ON C.CLUB_AT_CD = D.SO_CD "
-						+ "ORDER BY C.CLUB_CNT DESC LIMIT 6";
+				sql = "SELECT * FROM (SELECT C.CLUB_ID, C.CLUB_NM, C.INTRO_SAVE_FILE_NM, C.CLUB_AIM, C.CLUB_ACTIVE, S.SO_NM AS GB_CD, D.SO_NM AS AT_CD, C.CLUB_CNT "
+						+ "FROM CLUB C, SO_CD S, SO_CD D WHERE C.CLUB_GB_CD = S.SO_CD AND C.CLUB_AT_CD = D.SO_CD "
+						+ " ORDER BY C.CLUB_CNT DESC) WHERE ROWNUM <= 6";
 				conn = JDBCUtil.getConnection();
-				pstmt = conn.prepareStatement(SQL);
+				pstmt = conn.prepareStatement(sql);
 				rs = pstmt.executeQuery();
 				clubList = new ArrayList<ClubVO>();
 
 				while (rs.next()) {
 					ClubVO vo = new ClubVO();
-					vo.setClub_id(rs.getInt(1));
-					vo.setClub_nm(rs.getString(2));
-					vo.setIntro_save_file_nm(rs.getString(3));
-					vo.setClub_aim(rs.getString(4));
-					vo.setClub_active(rs.getString(5));
-					vo.setClub_gb_cd(rs.getString(6));
-					vo.setClub_at_cd(rs.getString(7));
+					vo.setClub_id(rs.getInt("CLUB_ID"));
+					vo.setClub_nm(rs.getString("CLUB_NM"));
+					vo.setIntro_save_file_nm(rs.getString("INTRO_SAVE_FILE_NM"));
+					vo.setClub_aim(rs.getString("CLUB_AIM"));
+					vo.setClub_active(rs.getString("CLUB_ACTIVE"));
+					vo.setClub_gb_cd(rs.getString("GB_CD"));
+					vo.setClub_at_cd(rs.getString("AT_CD"));
 					clubList.add(vo);
 				}
 
 			} else {
-				SQL =
-
-						"SELECT A.CLUB_ID, A.CLUB_NM, A.INTRO_SAVE_FILE_NM, IF(S.SO_NM IS NULL, '회원', S.SO_NM), GB.SO_NM, AT.SO_NM "
-								+ "FROM CLUB AS A JOIN CLUB_MEMBER AS B ON A.CLUB_ID = B.CLUB_ID "
-								+ "LEFT JOIN SO_CD AS S ON S.SO_CD = B.STAFF_CD "
-								+ "JOIN SO_CD AS GB ON A.CLUB_GB_CD = GB.SO_CD JOIN SO_CD AS AT ON A.CLUB_AT_CD = AT.SO_CD "
-								+ "WHERE STUDENT_ID = ? AND JOIN_CD = '008001' ORDER BY B.STAFF_CD IS NULL, B.STAFF_CD ";
-
-				pstmt = conn.prepareStatement(SQL);
+				sql = "SELECT S.SO_NM AS GB_CD, D.SO_NM AS AT_CD, T.* FROM SO_CD S, SO_CD D, (SELECT C.CLUB_ID, C.CLUB_NM, C.INTRO_SAVE_FILE_NM, C.CLUB_AIM, C.CLUB_ACTIVE, C.CLUB_GB_CD, C.CLUB_AT_CD, ZZ.STAFF "
+						+ " FROM CLUB C RIGHT OUTER JOIN (SELECT M.CLUB_ID, M.STAFF_CD, S.SO_NM AS STAFF FROM CLUB_MEMBER M, SO_CD S "
+						+ " WHERE M.STAFF_CD = S.SO_CD AND M.STUDENT_ID =? AND M.JOIN_CD = '008001' ORDER BY M.STAFF_CD)ZZ "
+						+ " ON C.CLUB_ID = ZZ.CLUB_ID)T WHERE S.SO_CD = T.CLUB_GB_CD AND D.SO_CD = T.CLUB_AT_CD";
+				conn = JDBCUtil.getConnection();
+				pstmt = conn.prepareStatement(sql);
 				pstmt.setString(1, student_id);
 				rs = pstmt.executeQuery();
 				clubList = new ArrayList<ClubVO>();
 				while (rs.next()) {
 					ClubVO vo = new ClubVO();
-					vo.setClub_id(rs.getInt(1));
-					vo.setClub_nm(rs.getString(2));
-					vo.setIntro_save_file_nm(rs.getString(3));
-					vo.setStaff_cd(rs.getString(4));
-					vo.setClub_gb_cd(rs.getString(5));
-					vo.setClub_at_cd(rs.getString(6));
+					vo.setClub_id(rs.getInt("CLUB_ID"));
+					vo.setClub_nm(rs.getString("CLUB_NM"));
+					vo.setIntro_save_file_nm(rs.getString("INTRO_SAVE_FILE_NM"));
+					vo.setStaff_cd(rs.getString("STAFF"));
+					vo.setClub_gb_cd(rs.getString("GB_CD"));
+					vo.setClub_at_cd(rs.getString("AT_CD"));
 					clubList.add(vo);
 				}
 			}
@@ -346,14 +277,16 @@ public class JDBC_clubDAO {
 		}
 		return clubList;
 	}
-
+	
+	// 동아리 개설일 가져오기
 	public String getOpen_Dt(int club_id) {
-		String sql = "SELECT OPEN_DT from club where CLUB_ID=" + club_id + ";";
+		String sql = "SELECT OPEN_DT from club where CLUB_ID=?";
 		String open_dt = "";
 
 		try {
 			conn = JDBCUtil.getConnection();
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, club_id);
 			rs = pstmt.executeQuery();
 			if (rs.next()) {
 				open_dt = rs.getString(1);
@@ -366,19 +299,19 @@ public class JDBC_clubDAO {
 		}
 		return null;
 	}
-
-	// 동아리 개설일 가져오기
+	
 	public String getMaster(int club_id) {
-		String sql = "SELECT NM from club_member where CLUB_ID=" + club_id + " and STAFF_CD =" + "004001" + ";";
-		String open_dt = "";
-
+		String sql = "SELECT NM FROM CLUB_MEMBER WHERE CLUB_ID = ? AND STAFF_CD = '004001'";
+		String name = "";
 		try {
+			conn = JDBCUtil.getConnection();
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, club_id);
 			rs = pstmt.executeQuery();
 			if (rs.next()) {
-				open_dt = rs.getString(1);
+				name = rs.getString(1);
 			}
-			return open_dt;
+			return name;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -387,7 +320,6 @@ public class JDBC_clubDAO {
 		return null;
 	}
 
-	// 동아리 개설일 가져오기
 	public String getClubNMs(int club_id) {
 		String SQL = "SELECT CLUB_NM FROM club where club_id=" + club_id;
 		String answer = "";
@@ -405,7 +337,6 @@ public class JDBC_clubDAO {
 			JDBCUtil.closeResource(rs, pstmt, conn);
 		}
 		return null;
-
 	}
 
 	public int getClubIds(String club_NM) {
@@ -426,18 +357,19 @@ public class JDBC_clubDAO {
 		}
 		return answer;// 디비 오류
 	}
-
+	
 	public ArrayList<String> getMyJoinClubList(String user_id) {
 		ArrayList<String> allMyClub = new ArrayList<>();
-		String sql = "SELECT CLUB_ID from club_member where STUDENT_ID = " + user_id + " and JOIN_CD = 008001;";
-
+		//String sql = "SELECT CLUB_ID from club_member where STUDENT_ID = " + user_id + " and JOIN_CD = 008001;";
+		String sql ="SELECT C.CLUB_NM FROM CLUB C, CLUB_MEMBER M WHERE C.CLUB_ID = M.CLUB_ID "
+				+ " AND M.STUDENT_ID =? AND JOIN_CD = '008001'";
 		try {
 			conn = JDBCUtil.getConnection();
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, user_id);
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
-				String clubNM = getClubNMs(rs.getInt(1));
-				allMyClub.add(clubNM);
+				allMyClub.add(rs.getString(1));
 			}
 			return allMyClub;
 
@@ -448,18 +380,18 @@ public class JDBC_clubDAO {
 		}
 		return null;
 	}
-
+	
 	public ArrayList<String> getMyWaitClubList(String user_id) {
 		ArrayList<String> allMyClub = new ArrayList<>();
-		String sql = "SELECT CLUB_ID from club_member where STUDENT_ID = " + user_id + " and JOIN_CD = 008003;";
-
+		//String sql = "SELECT CLUB_ID from club_member where STUDENT_ID = " + user_id + " and JOIN_CD = 008003;";
+		String sql = "SELECT C.CLUB_NM FROM CLUB C, CLUB_MEMBER M WHERE C.CLUB_ID = M.CLUB_ID AND STUDENT_ID = ? AND JOIN_CD = '008003'";
 		try {
 			conn = JDBCUtil.getConnection();
 			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, user_id);
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
-				String clubNM = getClubNMs(rs.getInt(1));
-				allMyClub.add(clubNM);
+				allMyClub.add(rs.getString(1));
 			}
 			return allMyClub;
 
@@ -470,7 +402,7 @@ public class JDBC_clubDAO {
 		}
 		return null;
 	}
-
+	
 	public int getJoin_cd(String username, String clubNM) {
 		String sql = "SELECT STAFF_CD FROM club_member where STUDENT_ID=" + username
 				+ " AND CLUB_ID=( SELECT CLUB_ID from club where CLUB_NM ='" + clubNM + "')";
@@ -493,7 +425,7 @@ public class JDBC_clubDAO {
 		}
 		return -1;
 	}
-
+	
 	public ArrayList<ClubVO> getClubInfo(int club_id) {
 		ArrayList<ClubVO> clubList = null;
 		String sql = "";
@@ -516,10 +448,8 @@ public class JDBC_clubDAO {
 				vo.setClub_active(rs.getString(7));
 				vo.setClub_room(rs.getString(8));
 				vo.setOpen_dt(rs.getString(9));
-
 				clubList.add(vo);
 			}
-
 		} catch (Exception e) {
 			System.out.println("database fail");
 		} finally {
@@ -527,6 +457,47 @@ public class JDBC_clubDAO {
 		}
 		return clubList;
 	}
+	
+	public int createClub(ClubVO CV, String student_id) {
+		String sql = "INSERT INTO CLUB(CLUB_ID, CLUB_NM, CLUB_GB_CD, CLUB_AT_CD, CLUB_CNT, CLUB_AIM, CLUB_ACTIVE, CLUB_ROOM,"
+				+ " OPEN_DT, INTRO_FILE_NM, INTRO_SAVE_FILE_NM, POSTER_FILE_NM, POSTER_SAVE_FILE_NM)"
+				+ " VALUES ((SELECT NVL(MAX(CLUB_ID),0)+1 FROM CLUB),?,?,?,?,?,?,?,?,?,?,?,?)";
+
+		String sql2 = "INSERT INTO CLUB_MEMBER(CLUB_ID, STUDENT_ID, STAFF_CD, JOIN_DT, JOIN_CD) VALUES "
+				+ "((SELECT NVL(MAX(CLUB_ID),0) FROM CLUB),?,'004001',TO_DATE(?,'yyyymmdd'),'008001')";
+		try {
+			conn = JDBCUtil.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, CV.getClub_nm());
+			pstmt.setString(2, CV.getClub_gb_cd());
+			pstmt.setString(3, CV.getClub_at_cd());
+			pstmt.setInt(4, CV.getCnt());
+			pstmt.setString(5, CV.getClub_aim());
+			pstmt.setString(6, CV.getClub_active());
+			pstmt.setString(7, CV.getClub_room());
+			pstmt.setString(8, CV.getOpen_dt());
+			pstmt.setString(9, CV.getIntro_file_nm());
+			pstmt.setString(10, CV.getIntro_save_file_nm());
+			pstmt.setString(11, CV.getPoster_file_nm());
+			pstmt.setString(12, CV.getPoster_save_file_nm());
+			pstmt.executeUpdate();
+			pstmt.close();
+			
+			pstmt = conn.prepareStatement(sql2);
+			pstmt.setString(1, student_id);
+			java.util.Date dt = new java.util.Date();
+			java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd");
+			String today = sdf.format(dt);
+			pstmt.setString(2, today);
+			return pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			JDBCUtil.closeResource(rs, pstmt, conn);
+		}
+		return -1;
+	}
+	//여기까지 수정완료
 
 	public int updateClub(ClubVO CV) {
 		String sql = "UPDATE CLUB SET CLUB_GB_CD = ? , CLUB_AT_CD = ?, CLUB_CNT = ?, CLUB_AIM = ?, CLUB_ACTIVE = ?, "
@@ -603,9 +574,7 @@ public class JDBC_clubDAO {
 			rs = pstmt.executeQuery();
 			if (rs.next()) {
 				str = rs.getString(1);
-			} else if (rs.wasNull()) {
-				str = "M";
-			} else {
+			}  else {
 				str = "N";
 			}
 			return str;
@@ -638,4 +607,28 @@ public class JDBC_clubDAO {
 		}
 		return -1;
 	}
+	
+	/*	public ArrayList<ClubVO> getboardwriteClub(String student_id) {
+	ArrayList<ClubVO> clubList = null;
+	String SQL = "";
+	try {
+		SQL = "SELECT * FROM CLUB WHERE CLUB_ID = ANY(SELECT CLUB_ID FROM CLUB_MEMBER WHERE STUDENT_ID = ? AND JOIN_CD = 008001)";
+		conn = JDBCUtil.getConnection();
+		pstmt = conn.prepareStatement(SQL);
+		pstmt.setString(1, student_id);
+		rs = pstmt.executeQuery();
+		clubList = new ArrayList<ClubVO>();
+		while (rs.next()) {
+			ClubVO vo = new ClubVO();
+			vo.setClub_id(rs.getInt(1));
+			vo.setClub_nm(rs.getString(2));
+			clubList.add(vo);
+		}
+	} catch (Exception e) {
+		e.printStackTrace();
+	} finally {
+		JDBCUtil.closeResource(rs, pstmt, conn);
+	}
+	return clubList;
+}*/
 }

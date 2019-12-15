@@ -17,7 +17,7 @@
 <jsp:include page="club_platform.jsp?club_id=<%=club_id%>"></jsp:include>
 
 		<div class="main">
-			<img width="980" height="700" src="upload/club/<%=club_poster%>" alt="">
+			<img width="980" height="700" src="upload/club/<%=club_poster%>" onerror="this.src='image/error.png'">
 		</div>
 </body>
 </html>
