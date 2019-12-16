@@ -192,7 +192,7 @@
                      } 
                %>
                            </td>
-                           <td><input type="text" id="total" value=<%=total_price%> readonly="readonly"></td>
+                           <td><input type="text" id="total" readonly="readonly" value= '<%=total_price%>' ></td>
                         </tr>
                      </tbody>
                   </table>

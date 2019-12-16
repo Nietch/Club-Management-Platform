@@ -43,7 +43,6 @@ public class JDBC_clubDAO {
 		ArrayList<ClubVO> list = new ArrayList<ClubVO>();
 		String sql = "";
 
-		int row_count = 0;
 		try {
 
 //			SQL = "SELECT SQL_CALC_FOUND_ROWS * FROM"

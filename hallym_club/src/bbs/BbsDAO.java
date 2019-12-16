@@ -150,9 +150,7 @@ public class BbsDAO {
 	}
 
 	public Bbs getBbs(int BOARD_NO) {
-
-		int i = cnt_update(BOARD_NO);
-
+		cnt_update(BOARD_NO);
 		String SQL = "SELECT * FROM board WHERE BOARD_NO = ?";
 
 		try {

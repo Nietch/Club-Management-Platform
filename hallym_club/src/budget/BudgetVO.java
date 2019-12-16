@@ -1,6 +1,5 @@
 package budget;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
