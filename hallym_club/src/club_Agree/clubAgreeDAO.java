@@ -12,7 +12,7 @@ import com.mysql.jdbc.PreparedStatement;
 import clubMember.clubMemberVo;
 
 public class clubAgreeDAO {
-	private Connection conn;
+	private Connection conn = null;
 	private PreparedStatement pstmt;
 	private ResultSet rs;
 	Statement st;
