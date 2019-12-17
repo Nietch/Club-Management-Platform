@@ -47,7 +47,7 @@
 			
 			int result2 = 0;
 			if(!user_name.equals("admin")){
-				 result2 = dao.update(club_id, user_name, null); //전 회장
+				 result2 = dao.update(club_id, user_name, "004004"); //전 회장
 			}
 					
 			if (result == -1 || result2 == -1) {

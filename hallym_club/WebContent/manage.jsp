@@ -23,31 +23,6 @@ html, body {
 	height: 100%;
 }
 
-/* table.type03 {
-	border-collapse: collapse;
-	text-align: center;
-	line-height: 1.5;
-	border-top: 1px solid #ccc;
-	border-left: 20px solid #369;
-	margin: auto;
-	text-align: center;
-	width: 100%;
-	font-size: 30px;
-}
-table.type03 th {
-	padding: 3px;
-	font-weight: bold;
-	vertical-align: top;
-	color: #153d73;
-	border-right: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
-}
-table.type03 td {
-	padding: 3px;
-	vertical-align: top;
-	border-right: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
-} */
 table.type04 {
 	border-collapse: collapse;
 	text-align: center;

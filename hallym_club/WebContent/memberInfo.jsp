@@ -78,7 +78,7 @@
 
 	<jsp:useBean id="member_dao" class="clubMember.clubMemberDAO" />
 		<%
-			ArrayList<clubMemberVo> member_list = member_dao.getMember(club_id,student_id);
+			ArrayList<clubMemberVo> member_list = member_dao.getMemberInfo(club_id,student_id);
 		%>	
 	
 	<ul>
@@ -89,7 +89,7 @@
 			<li> <%= member_list.get(0).getNM()%> (<%= member_list.get(0).getSTUDENT_ID()%>)</li>
 			<li style="float:right;">직책&nbsp;
 			<select id="staff" name="staff" style="font-size:20px" onchange="staff_change(this.form);"> 
-				<option value="" <%if (member_list.get(0).getSTAFF_CD().equals("회원"))
+				<option value="004004" <%if (member_list.get(0).getSTAFF_CD().equals("회원"))
 					out.println("selected");%>>회원</option>
 				<option value="004001" <%if (member_list.get(0).getSTAFF_CD().equals("회장"))
 					out.println("selected");%>>회장</option>
@@ -102,7 +102,7 @@
 				<input class="button" type="submit" name="btn" value="회장등록"  style="margin-left:50px;"/></li>
 			
 			<% }
-			else if(member_dao.getMember(club_id, username).get(0).getSTAFF_CD().equals("회장")) { %>
+			else if(member_dao.getMemberInfo(club_id, username).get(0).getSTAFF_CD().equals("회장")) { %>
 			<input class="button" type="submit" name="btn" value="회장위임"  style="margin-left:50px;"/></li>
 			<%} %>
 			</form>

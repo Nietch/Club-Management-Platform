@@ -55,13 +55,6 @@
 			out.println("<script>");
 			out.print("location.href='manage.jsp?club_id='+'" + club_id + "'");
 			out.println("</script>");
-
-			int writeResult = dao.writeNews(student_id, dao.getClubNMs(join_club) + "에 가입이 거절되었습니다.");
-			if (writeResult == -1) {
-				out.println("<script>");
-				out.print("alert('다시 시도해주세요.');");
-				out.println("</script>");
-			}
 	%>
 	<script>
 		     location.href="manage.jsp?club_id=<%=join_club%>";

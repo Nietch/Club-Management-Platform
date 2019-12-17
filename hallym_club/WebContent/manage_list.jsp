@@ -109,7 +109,7 @@ table.type04 td {
 			<%
 				int totalcount = 0;
 
-				ArrayList<clubMemberVo> member_list = member_dao.getMember(club_id, "008001", category, search, pageNumber);
+				ArrayList<clubMemberVo> member_list = member_dao.getMember(club_id, category, search, pageNumber);
 				try {
 					totalcount = member_list.get(0).getRow_count();
 				} catch (Exception e) {
@@ -261,10 +261,6 @@ table.type04 td {
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
 	<script>
-		function club_post() {
-			var id = document.getElementById("club_id").value;
-			location.href = "manage_list.jsp?club_id=" + id;
-		}
 		function popup(frm) {
 			var url = "memberInfo.jsp";
 			var title = "testpop";
@@ -279,22 +275,6 @@ table.type04 td {
 		}
 	</script>
 
-
-
-	<%-- 오류
-		function data_export(){
-		
-			<%
-			clubMemberDAO dao2 = new clubMemberDAO();
-			ArrayList<clubMemberVo> excel_list = dao2.getMember(club_id, "008001", category, search);
-			
-			//ArrayList<clubMemberVo> excel_list = member_dao.getMember(club_id, 1, category, search);
-			
-			CustomerExcelWriter excelWriter = new CustomerExcelWriter();
-			excelWriter.xlsWiter(excel_list);%>
-			alert('다운로드 폴더에 저장되었습니다.');
-
-		} --%>
 
 </body>
 </html>

@@ -107,7 +107,7 @@ public class clubMemberVo {
       this.hope = hope;
    }
    public String getSTAFF_CD() {
-      if(STAFF_CD == null)
+/*      if(STAFF_CD == null)
          STAFF_CD = "회원";
       else if(STAFF_CD.equals("004001")) 
          STAFF_CD = "회장";
@@ -115,7 +115,8 @@ public class clubMemberVo {
          STAFF_CD = "부회장";
       else if(STAFF_CD.equals("004003")) 
          STAFF_CD = "총무";
-      return STAFF_CD;
+      return STAFF_CD;*/
+	   return STAFF_CD;
    }
    public void setSTAFF_CD(String sTAFF_CD) {
       STAFF_CD = sTAFF_CD;   

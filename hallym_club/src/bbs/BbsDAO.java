@@ -21,8 +21,8 @@ public class BbsDAO {
 				+ "values(?,(select nvl(max(board_no),0)+1 from board),?,?,?,?,TO_DATE(?,'yyyy-mm-dd hh24:mi:ss'))";
 		if (bbs.getStart_date() != null || bbs.getEnd_date() != null) {
 			sql = "insert into board(club_id,board_no,board_cd,title,contents,input_id,input_date,start_date,end_date)"
-					+ "values(?,(select nvl(max(board_no),0)+1 from board),?,?,?,?,TO_DATE(?,'yyyy-mm-dd hh24:mi:ss'),"
-					+ bbs.getStart_date() + "," + bbs.getEnd_date() + ")";
+					+ "values(?,(select nvl(max(board_no),0)+1 from board),?,?,?,?,TO_DATE(?,'yyyy-mm-dd hh24:mi:ss'), "
+					+ " TO_DATE(?,'yyyy-mm-dd'), TO_DATE(?,'yyyy-mm-dd'))";
 		}
 		java.util.Date dt = new java.util.Date();
 		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -37,6 +37,10 @@ public class BbsDAO {
 			pstmt.setString(4, bbs.getCONTENTS());
 			pstmt.setString(5, INPUT_ID);
 			pstmt.setString(6, today);
+			if (bbs.getStart_date() != null || bbs.getEnd_date() != null) {
+				pstmt.setString(7, bbs.getStart_date());
+				pstmt.setString(8, bbs.getEnd_date());
+			}
 
 			return pstmt.executeUpdate();
 		} catch (Exception e) {
