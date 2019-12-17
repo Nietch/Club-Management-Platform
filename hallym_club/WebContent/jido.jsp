@@ -1,3 +1,4 @@
+<%@page import="util.JDBCUtil"%>
 <%@page import="sun.security.krb5.internal.PAEncTSEnc"%>
 <%@page import="java.net.URLEncoder"%>
 <%-- <%@page import="exam.jdbc.ClubVO"%> --%>
@@ -55,11 +56,7 @@
 					<%
 						response.setContentType("text/html;charset=utf-8;");
 						request.setCharacterEncoding("utf-8"); //charset, Encoding 설정
-						Class.forName("com.mysql.jdbc.Driver"); // load the drive
-						String DB_URL = "jdbc:mysql://localhost/mydb";
-						// 주의 : test by changing mydb to name that you make
-						String DB_USER = "root";
-						String DB_PASSWORD = "2865";
+						
 						Connection conn = null;
 						Statement stmt = null;
 						ResultSet rs = null;
@@ -75,9 +72,9 @@
 						int i = 0;
 
 						try {
-							conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+							conn = JDBCUtil.getConnection();
 							stmt = conn.createStatement();
-							String Query = "select rest_nm,latitute,longitude,rest_phone_no,address,post,input_id from restaurant;";
+							String Query = "select rest_nm,latitute,longitude,rest_phone_no,address,post,input_id from restaurant";
 
 							rs = stmt.executeQuery(Query);
 
@@ -92,14 +89,12 @@
 								i++;
 							}
 
-							rs.close(); // ResultSet exit
-							stmt.close(); // Statement exit
-							conn.close(); // Connection exit 
-
 						} catch (Exception e) {
+							e.printStackTrace();
+						} finally {
+							JDBCUtil.closeResource(rs, stmt, conn);
 						}
 					%>
-
 
 					<tr>
 						<%
